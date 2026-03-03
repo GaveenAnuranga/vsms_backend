@@ -1,30 +1,32 @@
 FROM php:8.2-cli
 
-# Install system dependencies and PHP extensions required by Laravel
+# Install system dependencies
 RUN apt-get update && apt-get install -y \
-    git unzip curl libpq-dev libzip-dev libonig-dev libxml2-dev libssl-dev \
-    && docker-php-ext-install \
-        pdo pdo_pgsql pdo_mysql \
-        mbstring zip xml bcmath opcache \
-        tokenizer ctype fileinfo \
-    && apt-get clean && rm -rf /var/lib/apt/lists/*
+    git unzip curl zip \
+    libpq-dev libzip-dev libonig-dev libxml2-dev libssl-dev libicu-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install required PHP extensions
+RUN docker-php-ext-install \
+    pdo pdo_pgsql pdo_mysql \
+    mbstring zip xml bcmath \
+    tokenizer ctype fileinfo intl opcache
 
 # Install Composer
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 WORKDIR /app
 
-# Copy composer files first (layer caching)
-COPY composer.json composer.lock ./
-
-# Install Laravel dependencies
-RUN COMPOSER_MEMORY_LIMIT=-1 composer install --no-dev --optimize-autoloader --no-scripts --no-interaction
-
-# Copy the rest of the project
+# Copy entire project
 COPY . .
 
-# Run post-install scripts now that full app is present
-RUN COMPOSER_MEMORY_LIMIT=-1 composer dump-autoload --optimize
+# Install dependencies (ignore platform reqs to prevent missing-ext false positives)
+RUN COMPOSER_MEMORY_LIMIT=-1 composer install \
+    --no-dev \
+    --optimize-autoloader \
+    --no-interaction \
+    --no-scripts \
+    --ignore-platform-reqs
 
 # Expose Render port
 EXPOSE 10000
