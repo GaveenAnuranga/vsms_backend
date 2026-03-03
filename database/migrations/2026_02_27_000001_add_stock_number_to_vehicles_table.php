@@ -12,13 +12,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('vehicles', function (Blueprint $table) {
-            // Add stock_number after vehicle_code; nullable initially so existing rows
-            // can be back-filled before adding the unique constraint.
-            $table->string('stock_number', 5)->nullable()->after('vehicle_code');
-        });
+        // Add the column only if it doesn't exist yet
+        // (2024_01_02 migration may have already created it)
+        if (!Schema::hasColumn('vehicles', 'stock_number')) {
+            Schema::table('vehicles', function (Blueprint $table) {
+                $table->string('stock_number', 5)->nullable()->after('vehicle_code');
+            });
+        }
 
-        // Back-fill existing rows: generate a unique 5-char uppercase alphanumeric code
+        // Back-fill any rows that still have no stock_number
         $vehicles = DB::table('vehicles')->whereNull('stock_number')->get(['id']);
         foreach ($vehicles as $vehicle) {
             do {
@@ -28,9 +30,9 @@ return new class extends Migration
             DB::table('vehicles')->where('id', $vehicle->id)->update(['stock_number' => $code]);
         }
 
-        // Now make the column non-nullable and add a unique index
+        // Ensure column is non-nullable with a unique index
         Schema::table('vehicles', function (Blueprint $table) {
-            $table->string('stock_number', 5)->nullable(false)->unique()->change();
+            $table->string('stock_number', 5)->nullable(false)->change();
         });
     }
 
