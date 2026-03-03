@@ -3,24 +3,25 @@ FROM php:8.2-cli
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
     git unzip curl zip \
-    libpq-dev libzip-dev libonig-dev libxml2-dev libssl-dev libicu-dev \
+    libpq-dev \
+    libzip-dev \
+    libonig-dev \
+    libxml2-dev \
+    libicu-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Install required PHP extensions
-RUN docker-php-ext-install \
-    pdo pdo_pgsql pdo_mysql \
-    mbstring zip xml bcmath \
-    tokenizer ctype fileinfo intl opcache
+# Install PHP extensions (tokenizer, ctype, fileinfo are built-in — do NOT install them)
+RUN docker-php-ext-install pdo pdo_pgsql pdo_mysql mbstring zip xml bcmath intl opcache
 
 # Install Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 WORKDIR /app
 
-# Copy entire project
+# Copy project files
 COPY . .
 
-# Install dependencies (ignore platform reqs to prevent missing-ext false positives)
+# Install Laravel dependencies
 RUN COMPOSER_MEMORY_LIMIT=-1 composer install \
     --no-dev \
     --optimize-autoloader \
