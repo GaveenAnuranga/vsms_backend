@@ -14,11 +14,11 @@ class UserSeeder extends Seeder
     public function run(): void
     {
         // Create Super Admin (Platform Admin)
-        User::firstOrCreate(
+        User::updateOrCreate(
             ['email' => 'sadmin@gmail.com'],
             [
                 'name' => 'Super Admin',
-                'password' => Hash::make('Sadnim@1234'),
+                'password' => Hash::make('Sadmin@1234'),
                 'role' => 'platform_admin',
                 'status' => 'active',
                 'tenant_id' => null, // Platform admin doesn't belong to any tenant
@@ -26,7 +26,7 @@ class UserSeeder extends Seeder
         );
 
         // Create Company Admin (for future use)
-        User::firstOrCreate(
+        User::updateOrCreate(
             ['email' => 'companyadmin@example.com'],
             [
                 'name' => 'Company Admin',
@@ -38,7 +38,7 @@ class UserSeeder extends Seeder
         );
 
         // Create Dealer Admin (for future use)
-        User::firstOrCreate(
+        User::updateOrCreate(
             ['email' => 'dealeradmin@example.com'],
             [
                 'name' => 'Dealer Admin',
@@ -50,6 +50,6 @@ class UserSeeder extends Seeder
         );
 
         $this->command->info('Users seeded successfully!');
-        $this->command->info('Super Admin: sadmin@gmail.com / Sadnim@1234');
+        $this->command->info('Super Admin: sadmin@gmail.com / Sadmin@1234');
     }
 }

@@ -17,5 +17,18 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        //
+        // Always return JSON for API routes
+        $exceptions->render(function (\Throwable $e, \Illuminate\Http\Request $request) {
+            if ($request->is('api/*') || $request->expectsJson()) {
+                $status = method_exists($e, 'getStatusCode') ? $e->getStatusCode() : 500;
+                $message = app()->hasDebugModeEnabled()
+                    ? $e->getMessage()
+                    : ($status === 500 ? 'Server Error' : $e->getMessage());
+                return response()->json([
+                    'success' => false,
+                    'message' => $message,
+                    'exception' => app()->hasDebugModeEnabled() ? get_class($e) : null,
+                ], $status);
+            }
+        });
     })->create();
