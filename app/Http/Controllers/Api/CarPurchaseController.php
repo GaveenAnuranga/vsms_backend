@@ -126,6 +126,7 @@ class CarPurchaseController extends Controller
                 'price' => $vehicle->price,
                 'color' => $vehicle->color,
                 'status' => $vehicle->status,
+                'dealer_id' => $vehicle->dealer_id,
             ],
         ]);
     }
