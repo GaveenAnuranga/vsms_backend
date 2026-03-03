@@ -340,9 +340,15 @@ class VehicleController extends Controller
     /**
      * Validate vehicle data
      */
-    private function validateVehicleData(Request $request): ValidatorContract
+    private function validateVehicleData(Request $request, ?int $excludeId = null): ValidatorContract
     {
+        $stockNumberRule = 'required|string|digits:5|unique:vehicles,stock_number';
+        if ($excludeId) {
+            $stockNumberRule .= ',' . $excludeId;
+        }
+
         return Validator::make($request->all(), [
+            'stockNumber' => $stockNumberRule,
             'make' => 'required|string|max:255',
             'model' => 'required|string|max:255',
             'subModel' => 'nullable|string|max:255',
@@ -382,7 +388,7 @@ class VehicleController extends Controller
         return Vehicle::create([
             'tenant_id' => $tenantId,
             'vehicle_code' => $this->generateVehicleCode(),
-            'stock_number' => $this->generateStockNumber(),
+            'stock_number' => $request->stockNumber,
             'make' => $request->make,
             'model' => $request->model,
             'sub_model' => $request->subModel,
@@ -410,22 +416,6 @@ class VehicleController extends Controller
         do {
             $code = 'VH' . date('Y') . rand(1000, 9999);
         } while (Vehicle::where('vehicle_code', $code)->exists());
-
-        return $code;
-    }
-
-    /**
-     * Generate unique stock number (5 uppercase alphanumeric chars, user-facing identifier)
-     */
-    private function generateStockNumber(): string
-    {
-        $chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-        do {
-            $code = '';
-            for ($i = 0; $i < 5; $i++) {
-                $code .= $chars[random_int(0, strlen($chars) - 1)];
-            }
-        } while (Vehicle::where('stock_number', $code)->exists());
 
         return $code;
     }
@@ -497,7 +487,7 @@ class VehicleController extends Controller
             return response()->json(['error' => 'Vehicle not found'], 404);
         }
 
-        $validator = $this->validateVehicleData($request);
+        $validator = $this->validateVehicleData($request, (int) $id);
 
         if ($validator->fails()) {
             return response()->json([
@@ -510,6 +500,7 @@ class VehicleController extends Controller
             DB::beginTransaction();
 
             $vehicle->update([
+                'stock_number' => $request->stockNumber ?? $vehicle->stock_number,
                 'make' => $request->make,
                 'model' => $request->model,
                 'sub_model' => $request->subModel,
