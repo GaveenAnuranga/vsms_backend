@@ -15,11 +15,11 @@ return new class extends Migration
             $table->id();
             $table->foreignId('tenant_id')->constrained('tenants');
             $table->string('name', 150);
-            $table->string('nic_or_reg', 100);
+            $table->string('nic_or_reg', 100)->nullable();
             $table->string('address', 255);
             $table->string('phone', 20);
-            $table->string('email', 150);
-            $table->enum('seller_type', ['individual', 'dealer', 'auction']);
+            $table->string('email', 150)->nullable();
+            $table->string('seller_type', 100)->default('individual');
             $table->timestamps();
         });
     }

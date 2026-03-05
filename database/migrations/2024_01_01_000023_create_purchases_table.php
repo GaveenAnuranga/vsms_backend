@@ -20,6 +20,9 @@ return new class extends Migration
             $table->foreignId('payment_method_id')->constrained('payment_methods');
             $table->string('invoice_number', 100);
             $table->decimal('tax_amount', 12, 2);
+            $table->string('branch', 150)->nullable();
+            $table->string('document_path', 255)->nullable();
+            $table->text('tax_details')->nullable();
             $table->timestamps();
         });
     }

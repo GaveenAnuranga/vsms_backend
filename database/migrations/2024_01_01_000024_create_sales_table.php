@@ -24,6 +24,10 @@ return new class extends Migration
             $table->string('invoice_number', 100);
             $table->decimal('commission', 12, 2)->default(0);
             $table->string('salesperson_name', 150);
+            $table->decimal('tax_amount', 12, 2)->default(0);
+            $table->string('branch', 150)->nullable();
+            $table->string('document_path', 255)->nullable();
+            $table->text('tax_details')->nullable();
             $table->timestamps();
         });
     }

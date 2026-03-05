@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Api\VehicleController;
+use App\Http\Controllers\Api\VehicleImageController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\DealerController;
 use App\Http\Controllers\Api\CarPurchaseController;
@@ -40,6 +41,9 @@ Route::prefix('account')->group(function () {
 
 // Vehicle API endpoints
 Route::prefix('vehicles')->group(function () {
+    // Get landing page vehicles (public, for website)
+    Route::get('/landing', [VehicleController::class, 'getLandingPageVehicles']);
+
     // Get all vehicles
     Route::get('/', [VehicleController::class, 'index']);
     
@@ -59,7 +63,7 @@ Route::prefix('vehicles')->group(function () {
     Route::delete('/{id}', [VehicleController::class, 'destroy']);
     
     // Upload vehicle images
-    Route::post('/{id}/images', [VehicleController::class, 'uploadImages']);
+    Route::post('/{id}/images', [VehicleImageController::class, 'upload']);
 });
 
 // Dealer API endpoints

@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('tenant_id')->constrained('tenants')->onDelete('cascade');
             $table->string('vehicle_code', 50)->unique();
+            $table->string('stock_number', 5)->nullable()->unique();
             $table->string('make', 100);
             $table->string('model', 100);
             $table->string('sub_model', 100)->nullable();

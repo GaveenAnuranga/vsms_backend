@@ -26,6 +26,12 @@ class CarPurchase extends Model
 {
     use HasFactory;
 
+    /**
+     * The purchase_sellers pivot references purchases.id,
+     * so this model must use the purchases table.
+     */
+    protected $table = 'purchases';
+
     protected $fillable = [
         'tenant_id',
         'vehicle_id',
@@ -68,8 +74,7 @@ class CarPurchase extends Model
      */
     public function sellers(): BelongsToMany
     {
-        return $this->belongsToMany(Seller::class, 'purchase_sellers')
-            ->withTimestamps();
+        return $this->belongsToMany(Seller::class, 'purchase_sellers', 'purchase_id', 'seller_id');
     }
 
     /**

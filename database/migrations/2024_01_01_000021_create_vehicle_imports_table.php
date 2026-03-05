@@ -14,9 +14,14 @@ return new class extends Migration
         Schema::create('vehicle_imports', function (Blueprint $table) {
             $table->id();
             $table->foreignId('vehicle_id')->unique()->constrained('vehicles')->onDelete('cascade');
-            $table->string('chassis_number', 100);
-            $table->string('engine_number', 100);
-            $table->integer('import_year');
+            $table->string('importer_name', 150)->nullable();
+            $table->string('importer_contact', 30)->nullable();
+            $table->boolean('register_notification')->default(false);
+            $table->date('register_notification_date')->nullable();
+            $table->boolean('notification_dismissed')->default(false);
+            $table->string('chassis_number', 100)->nullable();
+            $table->string('engine_number', 100)->nullable();
+            $table->integer('import_year')->nullable();
             $table->string('auction_grade', 10)->nullable();
         });
     }
