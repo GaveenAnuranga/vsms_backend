@@ -17,8 +17,17 @@ class VehicleImport extends Model
      */
     protected $fillable = [
         'vehicle_id',
+        // Unregistered vehicle fields
         'chassis_number',
         'engine_number',
+        // New importer fields
+        'importer_name',
+        'importer_contact',
+        // Registration notification fields
+        'register_notification',
+        'register_notification_date',
+        'notification_dismissed',
+        // Legacy fields (kept for backward compat)
         'import_year',
         'auction_grade',
     ];
@@ -30,6 +39,9 @@ class VehicleImport extends Model
      */
     protected $casts = [
         'import_year' => 'integer',
+        'register_notification' => 'boolean',
+        'register_notification_date' => 'date',
+        'notification_dismissed' => 'boolean',
     ];
 
     /**

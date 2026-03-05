@@ -13,6 +13,7 @@ class DatabaseSeeder extends Seeder
     {
         // Call seeders in order (respecting foreign key dependencies)
         $this->call([
+            PaymentMethodSeeder::class,
             SubscriptionPlanSeeder::class,
             TenantSeeder::class,
             UserSeeder::class,

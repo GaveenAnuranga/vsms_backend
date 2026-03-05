@@ -251,9 +251,16 @@ class VehicleController extends Controller
         // Add registration details if registered
         if ($vehicle->registration) {
             $data['registeredDetails'] = [
-                'registrationNumber' => $vehicle->registration->registration_number,
-                'numberPlate' => $vehicle->registration->number_plate,
-                'registrationDate' => $vehicle->registration->registration_date,
+                // New fields
+                'vehicleNumber'          => $vehicle->registration->vehicle_number,
+                'registrationYear'       => $vehicle->registration->registration_year,
+                'ownerName'              => $vehicle->registration->owner_name,
+                'ownerContact'           => $vehicle->registration->owner_contact,
+                'serviceRecord'          => $vehicle->registration->service_record,
+                // Legacy fields
+                'registrationNumber'     => $vehicle->registration->registration_number,
+                'numberPlate'            => $vehicle->registration->number_plate,
+                'registrationDate'       => $vehicle->registration->registration_date,
                 'numberOfPreviousOwners' => $vehicle->registration->number_of_previous_owners,
             ];
         }
@@ -261,9 +268,17 @@ class VehicleController extends Controller
         // Add import details if unregistered
         if ($vehicle->import) {
             $data['unregisteredDetails'] = [
-                'chassisNumber' => $vehicle->import->chassis_number,
-                'engineNumber' => $vehicle->import->engine_number,
-                'importYear' => $vehicle->import->import_year,
+                'chassisNumber'              => $vehicle->import->chassis_number,
+                'engineNumber'               => $vehicle->import->engine_number,
+                'importerName'               => $vehicle->import->importer_name,
+                'importerContact'            => $vehicle->import->importer_contact,
+                'registerNotification'       => (bool) $vehicle->import->register_notification,
+                'registerNotificationDate'   => $vehicle->import->register_notification_date
+                    ? $vehicle->import->register_notification_date->format('Y-m-d')
+                    : null,
+                'notificationDismissed'      => (bool) $vehicle->import->notification_dismissed,
+                // Legacy fields
+                'importYear'   => $vehicle->import->import_year,
                 'auctionGrade' => $vehicle->import->auction_grade,
             ];
         }
@@ -348,25 +363,38 @@ class VehicleController extends Controller
         }
 
         return Validator::make($request->all(), [
-            'stockNumber' => $stockNumberRule,
-            'make' => 'required|string|max:255',
-            'model' => 'required|string|max:255',
-            'subModel' => 'nullable|string|max:255',
-            'year' => 'required|integer|min:1900|max:' . (date('Y') + 1),
-            'color' => 'required|string|max:255',
-            'countryOfOrigin' => 'required|string|max:255',
-            'fuelType' => 'required|in:Gasoline,Diesel,Electric,Hybrid,Plug-in Hybrid',
-            'mileage' => 'required|integer|min:0',
-            'transmissionType' => 'required|in:Manual,Automatic,CVT,Semi-Automatic',
-            'engineSize' => 'nullable|string|max:50',
-            'vin' => 'nullable|string|max:255',
-            'registrationType' => 'required|in:Registered,Unregistered',
-            'price' => 'required|numeric|min:0',
-            'dealerId' => 'required|exists:dealers,id',
-            'status' => 'required|in:Available,Sold,Transferred,Reserved',
-            'description' => 'nullable|string',
-            'registeredDetails' => 'required_if:registrationType,Registered',
-            'unregisteredDetails' => 'required_if:registrationType,Unregistered',
+            'stockNumber'                                          => $stockNumberRule,
+            'make'                                                 => 'required|string|max:255',
+            'model'                                                => 'required|string|max:255',
+            'subModel'                                             => 'nullable|string|max:255',
+            'year'                                                 => 'required|integer|min:1900|max:' . (date('Y') + 1),
+            'color'                                                => 'required|string|max:255',
+            'countryOfOrigin'                                      => 'required|string|max:255',
+            'fuelType'                                             => 'required|in:Gasoline,Diesel,Electric,Hybrid,Plug-in Hybrid',
+            'mileage'                                              => 'required|integer|min:0',
+            'transmissionType'                                     => 'required|in:Manual,Automatic,CVT,Semi-Automatic',
+            'engineSize'                                           => 'nullable|string|max:50',
+            'vin'                                                  => 'nullable|string|max:17',
+            'registrationType'                                     => 'required|in:Registered,Unregistered',
+            'price'                                                => 'required|numeric|min:0',
+            'dealerId'                                             => 'required|exists:dealers,id',
+            'status'                                               => 'required|in:Available,Sold,Transferred,Reserved',
+            'description'                                          => 'nullable|string',
+            // Registered details
+            'registeredDetails'                                    => 'required_if:registrationType,Registered|array',
+            'registeredDetails.vehicleNumber'                      => 'required_if:registrationType,Registered|nullable|string|max:50',
+            'registeredDetails.registrationYear'                   => 'required_if:registrationType,Registered|nullable|integer|min:1900|max:' . (date('Y') + 1),
+            'registeredDetails.ownerName'                          => 'required_if:registrationType,Registered|nullable|string|max:150',
+            'registeredDetails.ownerContact'                       => 'required_if:registrationType,Registered|nullable|string|max:30',
+            'registeredDetails.serviceRecord'                      => 'nullable|string',
+            // Unregistered details
+            'unregisteredDetails'                                  => 'required_if:registrationType,Unregistered|array',
+            'unregisteredDetails.chassisNumber'                    => 'required_if:registrationType,Unregistered|nullable|string|max:100',
+            'unregisteredDetails.engineNumber'                     => 'required_if:registrationType,Unregistered|nullable|string|max:100',
+            'unregisteredDetails.importerName'                     => 'required_if:registrationType,Unregistered|nullable|string|max:150',
+            'unregisteredDetails.importerContact'                  => 'required_if:registrationType,Unregistered|nullable|string|max:30',
+            'unregisteredDetails.registerNotification'             => 'nullable|boolean',
+            'unregisteredDetails.registerNotificationDate'         => 'nullable|date|after:today',
         ]);
     }
 
@@ -428,11 +456,18 @@ class VehicleController extends Controller
         if (!$details) return;
 
         VehicleRegistration::create([
-            'vehicle_id' => $vehicleId,
-            'registration_number' => $details['registrationNumber'] ?? null,
-            'number_plate' => $details['numberPlate'] ?? null,
-            'registration_date' => $details['registrationDate'] ?? null,
-            'number_of_previous_owners' => $details['numberOfPreviousOwners'] ?? 0,
+            'vehicle_id'               => $vehicleId,
+            // New fields
+            'vehicle_number'           => $details['vehicleNumber'] ?? null,
+            'registration_year'        => $details['registrationYear'] ?? null,
+            'owner_name'               => $details['ownerName'] ?? null,
+            'owner_contact'            => $details['ownerContact'] ?? null,
+            'service_record'           => $details['serviceRecord'] ?? null,
+            // Legacy fields
+            'registration_number'      => $details['registrationNumber'] ?? null,
+            'number_plate'             => $details['numberPlate'] ?? null,
+            'registration_date'        => $details['registrationDate'] ?? null,
+            'number_of_previous_owners'=> $details['numberOfPreviousOwners'] ?? 0,
         ]);
     }
 
@@ -444,11 +479,17 @@ class VehicleController extends Controller
         if (!$details) return;
 
         VehicleImport::create([
-            'vehicle_id' => $vehicleId,
-            'chassis_number' => $details['chassisNumber'] ?? null,
-            'engine_number' => $details['engineNumber'] ?? null,
-            'import_year' => $details['importYear'] ?? null,
-            'auction_grade' => $details['auctionGrade'] ?? null,
+            'vehicle_id'                 => $vehicleId,
+            'chassis_number'             => $details['chassisNumber'] ?? null,
+            'engine_number'              => $details['engineNumber'] ?? null,
+            'importer_name'              => $details['importerName'] ?? null,
+            'importer_contact'           => $details['importerContact'] ?? null,
+            'register_notification'      => $details['registerNotification'] ?? false,
+            'register_notification_date' => $details['registerNotificationDate'] ?? null,
+            'notification_dismissed'     => false,
+            // Legacy fields
+            'import_year'                => $details['importYear'] ?? null,
+            'auction_grade'              => $details['auctionGrade'] ?? null,
         ]);
     }
 
@@ -522,24 +563,38 @@ class VehicleController extends Controller
             // Update or create registration/import details
             if ($request->registrationType === 'Registered') {
                 $vehicle->import()->delete();
+                $regDetails = $request->registeredDetails ?? [];
                 $vehicle->registration()->updateOrCreate(
                     ['vehicle_id' => $vehicle->id],
                     [
-                        'registration_number' => $request->registeredDetails['registrationNumber'] ?? null,
-                        'number_plate' => $request->registeredDetails['numberPlate'] ?? null,
-                        'registration_date' => $request->registeredDetails['registrationDate'] ?? null,
-                        'number_of_previous_owners' => $request->registeredDetails['numberOfPreviousOwners'] ?? 0,
+                        // New fields
+                        'vehicle_number'            => $regDetails['vehicleNumber'] ?? null,
+                        'registration_year'         => $regDetails['registrationYear'] ?? null,
+                        'owner_name'                => $regDetails['ownerName'] ?? null,
+                        'owner_contact'             => $regDetails['ownerContact'] ?? null,
+                        'service_record'            => $regDetails['serviceRecord'] ?? null,
+                        // Legacy fields
+                        'registration_number'       => $regDetails['registrationNumber'] ?? null,
+                        'number_plate'              => $regDetails['numberPlate'] ?? null,
+                        'registration_date'         => $regDetails['registrationDate'] ?? null,
+                        'number_of_previous_owners' => $regDetails['numberOfPreviousOwners'] ?? 0,
                     ]
                 );
             } else {
                 $vehicle->registration()->delete();
+                $impDetails = $request->unregisteredDetails ?? [];
                 $vehicle->import()->updateOrCreate(
                     ['vehicle_id' => $vehicle->id],
                     [
-                        'chassis_number' => $request->unregisteredDetails['chassisNumber'] ?? null,
-                        'engine_number' => $request->unregisteredDetails['engineNumber'] ?? null,
-                        'import_year' => $request->unregisteredDetails['importYear'] ?? null,
-                        'auction_grade' => $request->unregisteredDetails['auctionGrade'] ?? null,
+                        'chassis_number'             => $impDetails['chassisNumber'] ?? null,
+                        'engine_number'              => $impDetails['engineNumber'] ?? null,
+                        'importer_name'              => $impDetails['importerName'] ?? null,
+                        'importer_contact'           => $impDetails['importerContact'] ?? null,
+                        'register_notification'      => $impDetails['registerNotification'] ?? false,
+                        'register_notification_date' => $impDetails['registerNotificationDate'] ?? null,
+                        // Legacy fields
+                        'import_year'                => $impDetails['importYear'] ?? null,
+                        'auction_grade'              => $impDetails['auctionGrade'] ?? null,
                     ]
                 );
             }

@@ -17,6 +17,13 @@ class VehicleRegistration extends Model
      */
     protected $fillable = [
         'vehicle_id',
+        // New fields
+        'vehicle_number',
+        'registration_year',
+        'owner_name',
+        'owner_contact',
+        'service_record',
+        // Legacy fields (kept for backward compat)
         'registration_number',
         'number_plate',
         'registration_date',
@@ -29,6 +36,7 @@ class VehicleRegistration extends Model
      * @var array<string, string>
      */
     protected $casts = [
+        'registration_year' => 'integer',
         'registration_date' => 'date',
         'number_of_previous_owners' => 'integer',
     ];
