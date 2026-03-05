@@ -32,7 +32,7 @@ class StoreVehicleRequest extends FormRequest
             'registrationType'                             => 'required|in:Registered,Unregistered',
             'price'                                        => 'required|numeric|min:0',
             'dealerId'                                     => 'required|exists:dealers,id',
-            'status'                                       => 'required|in:Available,Sold,Transferred,Reserved',
+            'status'                                       => 'required|in:Available,Sold,Reserved',
             'description'                                  => 'nullable|string',
             'registeredDetails'                            => 'required_if:registrationType,Registered|array',
             'registeredDetails.vehicleNumber'              => 'required_if:registrationType,Registered|nullable|string|max:50',
@@ -47,6 +47,7 @@ class StoreVehicleRequest extends FormRequest
             'unregisteredDetails.importerContact'          => 'required_if:registrationType,Unregistered|nullable|string|max:30',
             'unregisteredDetails.registerNotification'     => 'nullable|boolean',
             'unregisteredDetails.registerNotificationDate' => 'nullable|date|after:today',
+            'unregisteredDetails.notificationNote'         => 'nullable|string|max:1000',
         ];
     }
 

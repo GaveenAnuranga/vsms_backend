@@ -79,9 +79,6 @@ class TransferController extends Controller
                 $vehicle = Vehicle::find($request->vehicle_id);
                 if ($vehicle) {
                     $vehicle->update(['dealer_id' => $request->to_dealer_id]);
-                    if ($vehicle->status === 'Available') {
-                        $vehicle->update(['status' => 'Transferred']);
-                    }
                 }
             }
 
@@ -129,9 +126,6 @@ class TransferController extends Controller
                 $vehicle = Vehicle::find($request->vehicle_id);
                 if ($vehicle) {
                     $vehicle->update(['dealer_id' => $request->to_dealer_id]);
-                    if ($vehicle->status === 'Available') {
-                        $vehicle->update(['status' => 'Transferred']);
-                    }
                 }
             }
 

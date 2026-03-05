@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use App\Models\VehicleNotification;
 
 /**
  * @property int $id
@@ -91,6 +92,14 @@ class Vehicle extends Model
     public function import(): HasOne
     {
         return $this->hasOne(VehicleImport::class);
+    }
+
+    /**
+     * Get the registration reminder notification for the vehicle.
+     */
+    public function notification(): HasOne
+    {
+        return $this->hasOne(VehicleNotification::class);
     }
 
     /**

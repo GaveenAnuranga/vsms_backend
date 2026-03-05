@@ -31,7 +31,7 @@ return new class extends Migration
             $table->enum('registration_type', ['Registered', 'Unregistered']);
             $table->decimal('price', 12, 2);
             $table->foreignId('dealer_id')->nullable()->constrained('dealers')->onDelete('set null');
-            $table->enum('status', ['Available', 'Sold', 'Transferred', 'Reserved'])->default('Available');
+            $table->enum('status', ['Available', 'Sold', 'Reserved'])->default('Available');
             $table->text('description')->nullable();
             $table->timestamps();
         });

@@ -22,7 +22,7 @@ class VehicleController extends Controller
     ) {}
 public function index(Request $request)
     {
-        $query = Vehicle::with(['registration', 'import', 'images', 'dealer', 'tenant']);
+        $query = Vehicle::with(['registration', 'import', 'notification', 'images', 'dealer', 'tenant']);
 
         if ($request->has('status')) {
             if ($request->status !== 'all') {
@@ -52,7 +52,7 @@ public function index(Request $request)
 
     public function show($id)
     {
-        $vehicle = Vehicle::with(['registration', 'import', 'images', 'dealer', 'tenant'])->find($id);
+        $vehicle = Vehicle::with(['registration', 'import', 'notification', 'images', 'dealer', 'tenant'])->find($id);
 
         if (!$vehicle) {
             return response()->json(['error' => 'Vehicle not found'], 404);
@@ -110,6 +110,7 @@ public function index(Request $request)
                 $this->vehicleService->syncRegistration($vehicle->id, $request->registeredDetails);
             } else {
                 $this->vehicleService->syncImport($vehicle->id, $request->unregisteredDetails);
+                $this->vehicleService->syncNotification($vehicle->id, $request->unregisteredDetails);
             }
 
             if ($request->has('images')) {
@@ -118,7 +119,7 @@ public function index(Request $request)
 
             DB::commit();
 
-            $vehicle->load(['registration', 'import', 'images', 'dealer']);
+            $vehicle->load(['registration', 'import', 'notification', 'images', 'dealer']);
 
             return response()->json([
                 'message' => 'Vehicle created successfully',
@@ -146,15 +147,17 @@ public function index(Request $request)
 
             if ($request->registrationType === 'Registered') {
                 $vehicle->import()->delete();
+                $this->vehicleService->syncNotification($vehicle->id, null);
                 $this->vehicleService->syncRegistration($vehicle->id, $request->registeredDetails ?? []);
             } else {
                 $vehicle->registration()->delete();
                 $this->vehicleService->syncImport($vehicle->id, $request->unregisteredDetails ?? []);
+                $this->vehicleService->syncNotification($vehicle->id, $request->unregisteredDetails ?? []);
             }
 
             DB::commit();
 
-            $vehicle->load(['registration', 'import', 'images', 'dealer']);
+            $vehicle->load(['registration', 'import', 'notification', 'images', 'dealer']);
 
             return response()->json([
                 'message' => 'Vehicle updated successfully',

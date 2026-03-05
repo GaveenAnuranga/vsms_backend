@@ -105,7 +105,7 @@ it('returns 422 when required transfer fields are missing', function () {
          ->assertJsonStructure(['error', 'messages']);
 });
 
-it('marks vehicle as Transferred when status is completed', function () {
+it('keeps vehicle as Available when transfer is completed', function () {
     $payload = [
         'vehicle_id'    => $this->vehicleId,
         'to_dealer_id'  => $this->dealerId,
@@ -118,7 +118,7 @@ it('marks vehicle as Transferred when status is completed', function () {
 
     $this->assertDatabaseHas('vehicles', [
         'id'     => $this->vehicleId,
-        'status' => 'Transferred',
+        'status' => 'Available',
     ]);
 });
 

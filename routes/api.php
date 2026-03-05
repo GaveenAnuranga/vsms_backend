@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\DealerController;
 use App\Http\Controllers\Api\CarPurchaseController;
 use App\Http\Controllers\Api\SalesController;
 use App\Http\Controllers\Api\TransferController;
+use App\Http\Controllers\Api\VehicleNotificationController;
 
 /*
 |--------------------------------------------------------------------------
@@ -144,4 +145,10 @@ Route::get('/user', function (Request $request) {
         return Auth::user();
     }
     return response()->json(['message' => 'Unauthenticated'], 401);
+});
+
+// Vehicle notification (registration reminder) endpoints
+Route::prefix('vehicle-notifications')->group(function () {
+    Route::get('/', [VehicleNotificationController::class, 'index']);
+    Route::post('/{id}/send-email', [VehicleNotificationController::class, 'sendEmail']);
 });

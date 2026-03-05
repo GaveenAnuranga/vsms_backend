@@ -6,6 +6,7 @@ use App\Models\Vehicle;
 use App\Models\VehicleRegistration;
 use App\Models\VehicleImport;
 use App\Models\VehicleImage;
+use App\Models\VehicleNotification;
 use Illuminate\Http\Request;
 
 class VehicleService
@@ -110,6 +111,31 @@ class VehicleService
                 'auction_grade'              => $details['auctionGrade'] ?? null,
             ]
         );
+    }
+
+    /**
+     * Create or update the vehicle_notifications record for an unregistered vehicle.
+     * Deletes the record when the notification is turned off.
+     */
+    public function syncNotification(int $vehicleId, ?array $details): void
+    {
+        if (!$details) {
+            VehicleNotification::where('vehicle_id', $vehicleId)->delete();
+            return;
+        }
+
+        $active = $details['registerNotification'] ?? false;
+        $date   = $details['registerNotificationDate'] ?? null;
+        $note   = $details['notificationNote'] ?? null;
+
+        if ($active && $date) {
+            VehicleNotification::updateOrCreate(
+                ['vehicle_id' => $vehicleId],
+                ['date' => $date, 'note' => $note]
+            );
+        } else {
+            VehicleNotification::where('vehicle_id', $vehicleId)->delete();
+        }
     }
 
     /**

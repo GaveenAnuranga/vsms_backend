@@ -62,6 +62,7 @@ class VehicleTransformer
                 'registerNotificationDate' => $i->register_notification_date
                     ? $i->register_notification_date->format('Y-m-d')
                     : null,
+                'notificationNote'         => $vehicle->notification?->note,
                 'notificationDismissed'    => (bool) $i->notification_dismissed,
                 'importYear'               => $i->import_year,
                 'auctionGrade'             => $i->auction_grade,
