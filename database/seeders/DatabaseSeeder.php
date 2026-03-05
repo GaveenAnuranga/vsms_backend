@@ -14,11 +14,9 @@ class DatabaseSeeder extends Seeder
         // Call seeders in order (respecting foreign key dependencies)
         $this->call([
             PaymentMethodSeeder::class,
-            SubscriptionPlanSeeder::class,
             TenantSeeder::class,
             UserSeeder::class,
             DealerSeeder::class,
-            VehicleSeeder::class,
         ]);
         
         $this->command->info('✅ All seeders completed successfully!');

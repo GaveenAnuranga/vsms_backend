@@ -33,16 +33,6 @@ class TenantSeeder extends Seeder
                 'subscription_end' => Carbon::now()->addYear(),
                 'status' => 'active',
             ],
-            [
-                'name' => 'Global Motors Ltd',
-                'email' => 'info@globalmotors.com',
-                'phone' => '+0987654321',
-                'address' => '456 Oak Avenue, Town, State 67890',
-                'subscription_plan_id' => $plan->id,
-                'subscription_start' => Carbon::now(),
-                'subscription_end' => Carbon::now()->addMonths(6),
-                'status' => 'active',
-            ],
         ];
 
         foreach ($tenants as $tenant) {
