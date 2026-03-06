@@ -20,9 +20,11 @@ class VehicleImport extends Model
         // Unregistered vehicle fields
         'chassis_number',
         'engine_number',
-        // New importer fields
-        'importer_name',
-        'importer_contact',
+        // Import date
+        'imported_date',
+        // Exporter fields
+        'exporter_name',
+        'exporter_contact',
         // Registration notification fields
         'register_notification',
         'register_notification_date',
@@ -39,6 +41,7 @@ class VehicleImport extends Model
      */
     protected $casts = [
         'import_year' => 'integer',
+        'imported_date' => 'date',
         'register_notification' => 'boolean',
         'register_notification_date' => 'date',
         'notification_dismissed' => 'boolean',

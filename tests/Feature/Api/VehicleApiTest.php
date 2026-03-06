@@ -91,8 +91,8 @@ it('creates a new vehicle and returns 201', function () {
         'unregisteredDetails' => [
             'chassisNumber'   => 'CH000111',
             'engineNumber'    => 'EN000222',
-            'importerName'    => 'Test Importer',
-            'importerContact' => '0779876543',
+            'exporterName'    => 'Test Exporter',
+            'exporterContact' => '0779876543',
         ],
     ];
 
@@ -126,7 +126,7 @@ it('rejects duplicate stock number', function () {
         'price'              => 18000,
         'dealerId'           => $this->dealerId,
         'status'             => 'Available',
-        'unregisteredDetails' => ['chassisNumber' => 'CH999', 'engineNumber' => 'EN999', 'importerName' => 'X', 'importerContact' => '07700'],
+        'unregisteredDetails' => ['chassisNumber' => 'CH999', 'engineNumber' => 'EN999', 'exporterName' => 'X', 'exporterContact' => '07700'],
     ];
 
     $this->postJson('/api/vehicles', $payload)
@@ -151,7 +151,7 @@ it('updates an existing vehicle', function () {
         'price'              => 27000,
         'dealerId'           => $this->dealerId,
         'status'             => 'Available',
-        'unregisteredDetails' => ['chassisNumber' => 'CH001', 'engineNumber' => 'EN001', 'importerName' => 'Imp', 'importerContact' => '07711'],
+        'unregisteredDetails' => ['chassisNumber' => 'CH001', 'engineNumber' => 'EN001', 'exporterName' => 'Exp', 'exporterContact' => '07711'],
     ];
 
     $this->putJson("/api/vehicles/{$this->vehicleId}", $payload)

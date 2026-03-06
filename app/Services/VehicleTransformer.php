@@ -56,8 +56,9 @@ class VehicleTransformer
             $data['unregisteredDetails'] = [
                 'chassisNumber'            => $i->chassis_number,
                 'engineNumber'             => $i->engine_number,
-                'importerName'             => $i->importer_name,
-                'importerContact'          => $i->importer_contact,
+                'importedDate'             => $i->imported_date ? $i->imported_date->format('Y-m-d') : null,
+                'exporterName'             => $i->exporter_name,
+                'exporterContact'          => $i->exporter_contact,
                 'registerNotification'     => (bool) $i->register_notification,
                 'registerNotificationDate' => $i->register_notification_date
                     ? $i->register_notification_date->format('Y-m-d')

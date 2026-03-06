@@ -102,8 +102,9 @@ class VehicleService
             [
                 'chassis_number'             => $details['chassisNumber'] ?? null,
                 'engine_number'              => $details['engineNumber'] ?? null,
-                'importer_name'              => $details['importerName'] ?? null,
-                'importer_contact'           => $details['importerContact'] ?? null,
+                'imported_date'              => $details['importedDate'] ?? null,
+                'exporter_name'              => $details['exporterName'] ?? null,
+                'exporter_contact'           => $details['exporterContact'] ?? null,
                 'register_notification'      => $details['registerNotification'] ?? false,
                 'register_notification_date' => $details['registerNotificationDate'] ?? null,
                 'notification_dismissed'     => $details['notificationDismissed'] ?? false,
