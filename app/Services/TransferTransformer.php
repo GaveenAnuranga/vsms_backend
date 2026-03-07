@@ -42,6 +42,7 @@ class TransferTransformer
                 'id'      => $transfer->fromDealer->id,
                 'name'    => $transfer->fromDealer->name,
                 'address' => $transfer->fromDealer->address,
+                'status'  => $transfer->fromDealer->status,
             ];
         }
 
@@ -50,6 +51,7 @@ class TransferTransformer
                 'id'      => $transfer->toDealer->id,
                 'name'    => $transfer->toDealer->name,
                 'address' => $transfer->toDealer->address,
+                'status'  => $transfer->toDealer->status,
             ];
         }
 

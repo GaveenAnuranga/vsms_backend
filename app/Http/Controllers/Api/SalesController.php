@@ -16,7 +16,7 @@ class SalesController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Sale::with(['vehicle', 'paymentMethod']);
+        $query = Sale::with(['vehicle', 'paymentMethod', 'buyer']);
 
         // Filter by tenant if authenticated
         if (Auth::check() && Auth::user()->tenant_id) {

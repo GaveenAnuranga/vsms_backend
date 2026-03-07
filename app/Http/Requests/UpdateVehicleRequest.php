@@ -57,6 +57,8 @@ class UpdateVehicleRequest extends FormRequest
             'unregisteredDetails.registerNotification'     => 'nullable|boolean',
             'unregisteredDetails.registerNotificationDate' => 'nullable|date|after:today',
             'unregisteredDetails.notificationNote'         => 'nullable|string|max:1000',
+            'unregisteredDetails.importYear'               => 'nullable|integer|min:1900|max:' . (date('Y') + 1),
+            'unregisteredDetails.auctionGrade'             => 'nullable|string|max:10',
         ];
     }
 

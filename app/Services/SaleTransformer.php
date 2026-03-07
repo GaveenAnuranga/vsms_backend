@@ -2,14 +2,12 @@
 
 namespace App\Services;
 
-use App\Models\Seller;
-
 class SaleTransformer
 {
     /**
      * Transform a Sale model into a response array.
      */
-    public function transform($sale, bool $includeBuyer = false): array
+    public function transform($sale, bool $includeBuyer = true): array
     {
         $data = [
             'id'              => $sale->id,
@@ -22,6 +20,12 @@ class SaleTransformer
             'invoiceNumber'   => $sale->invoice_number,
             'commission'      => $sale->commission,
             'salespersonName' => $sale->salesperson_name,
+            'taxAmount'       => $sale->tax_amount ?? 0,
+            'branch'          => $sale->branch ?? null,
+            'documentPath'    => $sale->document_path ?? null,
+            'taxDetails'      => $sale->tax_details ?? null,
+            'reminderDate'    => $sale->reminder_date,
+            'reminderNote'    => $sale->reminder_note ?? null,
             'createdAt'       => $sale->created_at,
             'updatedAt'       => $sale->updated_at,
         ];
@@ -51,7 +55,8 @@ class SaleTransformer
             ];
         }
 
-        if ($includeBuyer && $sale->buyer) {
+        // Always include buyer info
+        if ($sale->buyer) {
             $b = $sale->buyer;
             $data['buyer'] = [
                 'id'       => $b->id,
@@ -62,20 +67,6 @@ class SaleTransformer
                 'email'    => $b->email,
             ];
         }
-
-        // Resolve seller from sellers table by salesperson name, or use name as fallback
-        $seller = Seller::where('name', $sale->salesperson_name)->first();
-        $data['seller'] = $seller
-            ? [
-                'id'         => $seller->id,
-                'name'       => $seller->name,
-                'nicOrReg'   => $seller->nic_or_reg,
-                'address'    => $seller->address,
-                'phone'      => $seller->phone,
-                'email'      => $seller->email,
-                'sellerType' => $seller->seller_type,
-            ]
-            : ['name' => $sale->salesperson_name, 'phone' => null];
 
         return $data;
     }

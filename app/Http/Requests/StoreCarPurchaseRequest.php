@@ -31,6 +31,12 @@ class StoreCarPurchaseRequest extends FormRequest
             'seller_email'      => 'nullable|email|max:150',
             'seller_nic'        => 'nullable|string|max:100',
             'seller_type'       => 'nullable|in:individual,dealer,auction',
+            'salesperson_name'  => 'required|string|max:150',
+            'discount'          => 'nullable|numeric|min:0',
+            'commission'        => 'nullable|numeric|min:0',
+            'reminder_active'   => 'nullable|boolean',
+            'reminder_date'     => 'nullable|date|after:today',
+            'reminder_description' => 'nullable|string|max:1000',
         ];
     }
 

@@ -43,6 +43,12 @@ class Sale extends Model
         'invoice_number',
         'commission',
         'salesperson_name',
+        'tax_amount',
+        'branch',
+        'document_path',
+        'tax_details',
+        'reminder_date',
+        'reminder_note',
     ];
 
     protected $casts = [
@@ -51,6 +57,8 @@ class Sale extends Model
         'discount' => 'decimal:2',
         'final_amount' => 'decimal:2',
         'commission' => 'decimal:2',
+        'tax_amount' => 'decimal:2',
+        'reminder_date' => 'date',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];
