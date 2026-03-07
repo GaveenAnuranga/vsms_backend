@@ -7,6 +7,7 @@ use App\Models\Vehicle;
 use App\Models\VehicleImage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
 class VehicleImageController extends Controller
@@ -62,23 +63,24 @@ class VehicleImageController extends Controller
 
         try {
             $uploaded = [];
+            $disk     = env('IMAGE_STORAGE_DISK', 'public');
 
             foreach ($images as $imageData) {
-                $file         = $imageData['file'];
-                $category     = $imageData['category'];
-                $path         = $file->store('vehicles/' . $vehicle->id, 'public');
-                $relativePath = '/storage/' . $path;
+                $file     = $imageData['file'];
+                $category = $imageData['category'];
+                $path     = $file->store('vehicles/' . $vehicle->id, $disk);
+                $imageUrl = Storage::disk($disk)->url($path);
 
-                Log::info('Image stored:', ['path' => $path, 'category' => $category]);
+                Log::info('Image stored:', ['path' => $path, 'category' => $category, 'disk' => $disk]);
 
-                $image              = VehicleImage::create([
+                $image    = VehicleImage::create([
                     'vehicle_id'     => $vehicle->id,
                     'image_category' => $category,
-                    'image_url'      => $relativePath,
+                    'image_url'      => $imageUrl,
                 ]);
-                $imageArr           = $image->toArray();
-                $imageArr['image_url'] = url($relativePath);
-                $uploaded[]         = $imageArr;
+                $imageArr = $image->toArray();
+                $imageArr['image_url'] = $imageUrl;
+                $uploaded[] = $imageArr;
             }
 
             return response()->json(['message' => 'Images uploaded successfully', 'images' => $uploaded], 201);

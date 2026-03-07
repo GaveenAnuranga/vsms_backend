@@ -121,9 +121,11 @@ class VehicleTransformer
 
         foreach ($images as $image) {
             $url = $image->image_url;
+            // Relative paths (legacy local storage) → convert to absolute
             if (str_starts_with($url, '/storage/')) {
                 $url = url($url);
             }
+            // Already absolute URL (S3, CDN, or local Storage::url()) → use as-is
 
             if ($image->image_category === 'others') {
                 $grouped['others'][] = $url;
