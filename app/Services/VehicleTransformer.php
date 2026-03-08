@@ -158,14 +158,19 @@ class VehicleTransformer
             return url($storedValue);
         }
 
-        // Case 3 & 4: absolute URL
+        // Case 3: absolute URL — only rewrite if it belongs to this app's local disk
+        // (i.e., same host as APP_URL). External URLs (Supabase, S3, CDN) pass through.
         $parsed = parse_url($storedValue);
-        if (isset($parsed['path']) && str_starts_with($parsed['path'], '/storage/')) {
-            // Local disk URL from a different APP_URL — strip host, rebuild cleanly
+        $appHost = parse_url(config('app.url'), PHP_URL_HOST);
+        if (
+            isset($parsed['host'], $parsed['path']) &&
+            $parsed['host'] === $appHost &&
+            str_starts_with($parsed['path'], '/storage/')
+        ) {
             return url($parsed['path']);
         }
 
-        // Case 4: external URL (S3, CDN, etc.) — use as-is
+        // Case 4: external URL (Supabase, S3, CDN, etc.) — use as-is
         return $storedValue;
     }
 }
