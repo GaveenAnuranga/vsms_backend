@@ -120,12 +120,7 @@ class VehicleTransformer
         ];
 
         foreach ($images as $image) {
-            $url = $image->image_url;
-            // Relative paths (legacy local storage) → convert to absolute
-            if (str_starts_with($url, '/storage/')) {
-                $url = url($url);
-            }
-            // Already absolute URL (S3, CDN, or local Storage::url()) → use as-is
+            $url = $this->resolveImageUrl($image->image_url);
 
             if ($image->image_category === 'others') {
                 $grouped['others'][] = $url;
@@ -135,5 +130,31 @@ class VehicleTransformer
         }
 
         return $grouped;
+    }
+
+    /**
+     * Resolve a stored image URL to an absolute URL using the current APP_URL.
+     *
+     * Handles three cases:
+     *  1. Relative /storage/... path (old format) → rebuild with url()
+     *  2. Absolute URL whose path starts with /storage/ (stored with a different
+     *     APP_URL, e.g. http://localhost:8000) → extract path, rebuild with url()
+     *  3. External URL (S3, CDN, etc.) → use as-is
+     */
+    private function resolveImageUrl(string $storedUrl): string
+    {
+        // Case 1: relative path
+        if (str_starts_with($storedUrl, '/storage/')) {
+            return url($storedUrl);
+        }
+
+        // Case 2: absolute URL for local disk (path begins with /storage/)
+        $parsed = parse_url($storedUrl);
+        if (isset($parsed['path']) && str_starts_with($parsed['path'], '/storage/')) {
+            return url($parsed['path']);
+        }
+
+        // Case 3: external URL (S3, CDN, etc.) — use as-is
+        return $storedUrl;
     }
 }
