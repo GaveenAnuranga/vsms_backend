@@ -73,13 +73,15 @@ class VehicleImageController extends Controller
 
                 Log::info('Image stored:', ['path' => $path, 'category' => $category, 'disk' => $disk]);
 
+                // Store only the relative storage path so the URL can always be
+                // regenerated correctly regardless of APP_URL or storage disk changes.
                 $image    = VehicleImage::create([
                     'vehicle_id'     => $vehicle->id,
                     'image_category' => $category,
-                    'image_url'      => $imageUrl,
+                    'image_url'      => $path,
                 ]);
                 $imageArr = $image->toArray();
-                $imageArr['image_url'] = $imageUrl;
+                $imageArr['image_url'] = $imageUrl; // return the full URL to the caller
                 $uploaded[] = $imageArr;
             }
 

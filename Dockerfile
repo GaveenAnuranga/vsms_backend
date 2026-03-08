@@ -43,4 +43,4 @@ RUN COMPOSER_MEMORY_LIMIT=-1 composer install \
 
 EXPOSE 10000
 
-CMD sh -c '[ -z "$APP_KEY" ] && php artisan key:generate --force; php artisan migrate --force && php artisan db:seed --force && php artisan storage:link --force && php artisan serve --host=0.0.0.0 --port=10000'
+CMD sh -c '[ -z "$APP_KEY" ] && php artisan key:generate --force; php artisan migrate --force && php artisan storage:link --force && php artisan serve --host=0.0.0.0 --port=10000'

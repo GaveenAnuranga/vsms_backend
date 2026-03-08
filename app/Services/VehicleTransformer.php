@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Vehicle;
+use Illuminate\Support\Facades\Storage;
 
 class VehicleTransformer
 {
@@ -133,28 +134,38 @@ class VehicleTransformer
     }
 
     /**
-     * Resolve a stored image URL to an absolute URL using the current APP_URL.
+     * Resolve a stored image value to an absolute URL.
      *
-     * Handles three cases:
-     *  1. Relative /storage/... path (old format) → rebuild with url()
-     *  2. Absolute URL whose path starts with /storage/ (stored with a different
-     *     APP_URL, e.g. http://localhost:8000) → extract path, rebuild with url()
-     *  3. External URL (S3, CDN, etc.) → use as-is
+     * Handles four cases in order:
+     *  1. Plain storage disk path (new format) e.g. "vehicles/51/xxx.webp"
+     *     → regenerate via Storage::disk()->url() using the current disk config.
+     *  2. Relative /storage/... web path (legacy local format)
+     *     → rebuild with url() using current APP_URL.
+     *  3. Absolute URL whose path starts with /storage/ (stored with a different
+     *     APP_URL, e.g. http://localhost:8000) → extract path, rebuild with url().
+     *  4. External URL (S3, CDN, etc.) → use as-is.
      */
-    private function resolveImageUrl(string $storedUrl): string
+    private function resolveImageUrl(string $storedValue): string
     {
-        // Case 1: relative path
-        if (str_starts_with($storedUrl, '/storage/')) {
-            return url($storedUrl);
+        // Case 1: plain storage disk path — no scheme, no leading slash
+        if (! str_starts_with($storedValue, '/') && ! preg_match('/^https?:\/\//', $storedValue)) {
+            $disk = env('IMAGE_STORAGE_DISK', 'public');
+            return Storage::disk($disk)->url($storedValue);
         }
 
-        // Case 2: absolute URL for local disk (path begins with /storage/)
-        $parsed = parse_url($storedUrl);
+        // Case 2: web-relative path starting with /storage/
+        if (str_starts_with($storedValue, '/storage/')) {
+            return url($storedValue);
+        }
+
+        // Case 3 & 4: absolute URL
+        $parsed = parse_url($storedValue);
         if (isset($parsed['path']) && str_starts_with($parsed['path'], '/storage/')) {
+            // Local disk URL from a different APP_URL — strip host, rebuild cleanly
             return url($parsed['path']);
         }
 
-        // Case 3: external URL (S3, CDN, etc.) — use as-is
-        return $storedUrl;
+        // Case 4: external URL (S3, CDN, etc.) — use as-is
+        return $storedValue;
     }
 }

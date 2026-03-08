@@ -1,0 +1,13 @@
+services:
+  backend:
+    build: .
+    ports:
+      - "10000:10000"
+    env_file: .env
+    volumes:
+      # Persist uploaded images across container rebuilds/restarts
+      - vehicle_images:/app/storage/app/public
+    restart: unless-stopped
+
+volumes:
+  vehicle_images:
