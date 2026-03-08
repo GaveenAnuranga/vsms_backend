@@ -63,7 +63,7 @@ class VehicleImageController extends Controller
 
         try {
             $uploaded = [];
-            $disk     = env('IMAGE_STORAGE_DISK', 'public');
+            $disk     = config('filesystems.image_disk', 'public');
 
             foreach ($images as $imageData) {
                 $file     = $imageData['file'];

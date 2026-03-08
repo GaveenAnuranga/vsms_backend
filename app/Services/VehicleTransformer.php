@@ -149,7 +149,7 @@ class VehicleTransformer
     {
         // Case 1: plain storage disk path — no scheme, no leading slash
         if (! str_starts_with($storedValue, '/') && ! preg_match('/^https?:\/\//', $storedValue)) {
-            $disk = env('IMAGE_STORAGE_DISK', 'public');
+            $disk = config('filesystems.image_disk', 'public');
             return Storage::disk($disk)->url($storedValue);
         }
 

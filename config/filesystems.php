@@ -15,6 +15,9 @@ return [
 
     'default' => env('FILESYSTEM_DISK', 'local'),
 
+    // Disk used for vehicle image uploads
+    'image_disk' => env('IMAGE_STORAGE_DISK', 'public'),
+
     /*
     |--------------------------------------------------------------------------
     | Filesystem Disks
@@ -73,6 +76,11 @@ return [
             'visibility'              => 'public',
             'throw'                   => true,
             'report'                  => false,
+            // SSL_CA_BUNDLE: set this env var on Windows dev to the cacert.pem path.
+            // Leave unset in production (Linux uses system CA bundle automatically).
+            'http'                    => [
+                'verify' => env('SSL_CA_BUNDLE', true),
+            ],
         ],
 
     ],
