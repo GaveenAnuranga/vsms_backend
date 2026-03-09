@@ -142,12 +142,27 @@ class VehicleTransformer
      */
     private function resolveImageUrl(string $storedValue): string
     {
-        // Full public URL (Supabase or other external storage) — return as-is.
+        $bucket = config('filesystems.disks.supabase.bucket', 'vehicles');
+
         if (preg_match('/^https?:\/\//', $storedValue)) {
+            // Full URL already stored — fix legacy records that are missing the bucket
+            // name in the path (e.g. stored as .../object/public/60/file.jpg instead
+            // of .../object/public/vehicles/60/file.jpg).
+            if (
+                str_contains($storedValue, 'supabase.co/storage/v1/object/public/') &&
+                ! str_contains($storedValue, "/object/public/{$bucket}/")
+            ) {
+                return str_replace(
+                    '/object/public/',
+                    "/object/public/{$bucket}/",
+                    $storedValue
+                );
+            }
+
             return $storedValue;
         }
 
-        // Legacy relative storage path — resolve via Supabase disk.
+        // Relative storage path — resolve to a full Supabase public URL.
         return Storage::disk('supabase')->url($storedValue);
     }
 }
