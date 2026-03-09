@@ -15,9 +15,6 @@ return [
 
     'default' => env('FILESYSTEM_DISK', 'local'),
 
-    // Disk used for vehicle image uploads
-    'image_disk' => env('IMAGE_STORAGE_DISK', 'public'),
-
     /*
     |--------------------------------------------------------------------------
     | Filesystem Disks

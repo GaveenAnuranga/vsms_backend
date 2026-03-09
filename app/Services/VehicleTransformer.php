@@ -134,43 +134,20 @@ class VehicleTransformer
     }
 
     /**
-     * Resolve a stored image value to an absolute URL.
+     * Resolve a stored image value to an absolute public URL.
      *
-     * Handles four cases in order:
-     *  1. Plain storage disk path (new format) e.g. "vehicles/51/xxx.webp"
-     *     → regenerate via Storage::disk()->url() using the current disk config.
-     *  2. Relative /storage/... web path (legacy local format)
-     *     → rebuild with url() using current APP_URL.
-     *  3. Absolute URL whose path starts with /storage/ (stored with a different
-     *     APP_URL, e.g. http://localhost:8000) → extract path, rebuild with url().
-     *  4. External URL (S3, CDN, etc.) → use as-is.
+     * Images are stored as full Supabase public URLs.
+     * Legacy relative paths (from before the Supabase migration) are resolved
+     * via the Supabase disk so existing records continue to work.
      */
     private function resolveImageUrl(string $storedValue): string
     {
-        // Case 1: plain storage disk path — no scheme, no leading slash
-        if (! str_starts_with($storedValue, '/') && ! preg_match('/^https?:\/\//', $storedValue)) {
-            $disk = config('filesystems.image_disk', 'public');
-            return Storage::disk($disk)->url($storedValue);
+        // Full public URL (Supabase or other external storage) — return as-is.
+        if (preg_match('/^https?:\/\//', $storedValue)) {
+            return $storedValue;
         }
 
-        // Case 2: web-relative path starting with /storage/
-        if (str_starts_with($storedValue, '/storage/')) {
-            return url($storedValue);
-        }
-
-        // Case 3: absolute URL — only rewrite if it belongs to this app's local disk
-        // (i.e., same host as APP_URL). External URLs (Supabase, S3, CDN) pass through.
-        $parsed = parse_url($storedValue);
-        $appHost = parse_url(config('app.url'), PHP_URL_HOST);
-        if (
-            isset($parsed['host'], $parsed['path']) &&
-            $parsed['host'] === $appHost &&
-            str_starts_with($parsed['path'], '/storage/')
-        ) {
-            return url($parsed['path']);
-        }
-
-        // Case 4: external URL (Supabase, S3, CDN, etc.) — use as-is
-        return $storedValue;
+        // Legacy relative storage path — resolve via Supabase disk.
+        return Storage::disk('supabase')->url($storedValue);
     }
 }

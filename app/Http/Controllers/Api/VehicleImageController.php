@@ -63,25 +63,26 @@ class VehicleImageController extends Controller
 
         try {
             $uploaded = [];
-            $disk     = config('filesystems.image_disk', 'public');
 
             foreach ($images as $imageData) {
                 $file     = $imageData['file'];
                 $category = $imageData['category'];
-                $path     = $file->store('vehicles/' . $vehicle->id, $disk);
-                $imageUrl = Storage::disk($disk)->url($path);
 
-                Log::info('Image stored:', ['path' => $path, 'category' => $category, 'disk' => $disk]);
+                // Always upload to Supabase storage bucket.
+                // Store directly under the vehicle ID folder.
+                $path     = $file->store((string) $vehicle->id, 'supabase');
+                // Resolve the full public URL immediately and persist it in the DB.
+                // This keeps image retrieval simple: read the URL, use it directly.
+                $imageUrl = Storage::disk('supabase')->url($path);
 
-                // Store only the relative storage path so the URL can always be
-                // regenerated correctly regardless of APP_URL or storage disk changes.
+                Log::info('Image stored in Supabase:', ['path' => $path, 'category' => $category, 'url' => $imageUrl]);
+
                 $image    = VehicleImage::create([
                     'vehicle_id'     => $vehicle->id,
                     'image_category' => $category,
-                    'image_url'      => $path,
+                    'image_url'      => $imageUrl, // full Supabase public URL
                 ]);
                 $imageArr = $image->toArray();
-                $imageArr['image_url'] = $imageUrl; // return the full URL to the caller
                 $uploaded[] = $imageArr;
             }
 
