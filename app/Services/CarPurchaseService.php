@@ -68,7 +68,7 @@ class CarPurchaseService
             'tax_amount'        => $request->input('tax_amount', 0),
             'branch'            => $request->branch ?? null,
             'document_path'     => $documentPath,
-            'tax_details'       => $request->tax_details ?? null,
+            'description'       => $request->description ?? null,
             'reminder_date'     => ($request->input('reminder_active') && $request->input('reminder_date'))
                                     ? $request->input('reminder_date')
                                     : null,
@@ -99,7 +99,7 @@ class CarPurchaseService
             'taxAmount'       => $sale->tax_amount,
             'branch'          => $sale->branch,
             'documentPath'    => $documentPath,
-            'taxDetails'      => $sale->tax_details,
+            'description'     => $sale->description,
             'reminderDate'    => $sale->reminder_date,
             'reminderNote'    => $sale->reminder_note,
             'createdAt'       => $sale->created_at,

@@ -23,7 +23,7 @@ class SaleTransformer
             'taxAmount'       => $sale->tax_amount ?? 0,
             'branch'          => $sale->branch ?? null,
             'documentPath'    => $sale->document_path ?? null,
-            'taxDetails'      => $sale->tax_details ?? null,
+            'description'     => $sale->description ?? null,
             'reminderDate'    => $sale->reminder_date,
             'reminderNote'    => $sale->reminder_note ?? null,
             'createdAt'       => $sale->created_at,

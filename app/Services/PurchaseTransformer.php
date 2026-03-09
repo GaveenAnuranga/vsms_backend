@@ -21,7 +21,7 @@ class PurchaseTransformer
             'taxAmount'       => $purchase->tax_amount,
             'branch'          => $purchase->branch,
             'documentPath'    => $purchase->document_path,
-            'taxDetails'      => $purchase->tax_details,
+            'description'     => $purchase->description,
             'createdAt'       => $purchase->created_at,
             'updatedAt'       => $purchase->updated_at,
         ];

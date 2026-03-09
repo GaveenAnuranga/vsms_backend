@@ -175,7 +175,7 @@ class CarPurchaseController extends Controller
                 'tax_amount'        => $request->tax_amount ?? 0,
                 'branch'            => $request->branch,
                 'document_path'     => $documentPath,
-                'tax_details'       => $request->tax_details,
+                'description'       => $request->description,
             ]);
 
             $seller = Seller::updateOrCreate(

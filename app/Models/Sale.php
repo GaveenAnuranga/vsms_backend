@@ -46,7 +46,7 @@ class Sale extends Model
         'tax_amount',
         'branch',
         'document_path',
-        'tax_details',
+        'description',
         'reminder_date',
         'reminder_note',
     ];

@@ -18,7 +18,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
  * @property float $tax_amount
  * @property string|null $branch
  * @property string|null $document_path
- * @property string|null $tax_details
+ * @property string|null $description
  * @property \Carbon\Carbon $created_at
  * @property \Carbon\Carbon $updated_at
  */
@@ -42,7 +42,7 @@ class CarPurchase extends Model
         'tax_amount',
         'branch',
         'document_path',
-        'tax_details',
+        'description',
     ];
 
     protected $casts = [
