@@ -59,6 +59,9 @@ Route::prefix('vehicles')->group(function () {
     
     // Update vehicle
     Route::put('/{id}', [VehicleController::class, 'update']);
+
+    // Update vehicle registration type only
+    Route::patch('/{id}/registration-type', [VehicleController::class, 'updateRegistrationType']);
     
     // Delete vehicle
     Route::delete('/{id}', [VehicleController::class, 'destroy']);

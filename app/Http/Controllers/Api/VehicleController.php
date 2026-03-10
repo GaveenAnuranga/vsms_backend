@@ -185,5 +185,65 @@ public function index(Request $request)
             return response()->json(['error' => 'Failed to delete vehicle', 'message' => $e->getMessage()], 500);
         }
     }
+
+    public function updateRegistrationType(Request $request, $id)
+    {
+        $vehicle = Vehicle::find($id);
+
+        if (!$vehicle) {
+            return response()->json(['error' => 'Vehicle not found'], 404);
+        }
+
+        $validated = $request->validate([
+            'registrationType'                             => 'required|in:Registered,Unregistered',
+            'registeredDetails'                            => 'required_if:registrationType,Registered|nullable|array',
+            'registeredDetails.vehicleNumber'              => 'nullable|string|max:50',
+            'registeredDetails.registrationYear'           => 'nullable|integer|min:1900|max:' . (date('Y') + 1),
+            'registeredDetails.ownerName'                  => 'nullable|string|max:150',
+            'registeredDetails.ownerContact'               => 'nullable|string|max:30',
+            'registeredDetails.serviceRecord'              => 'nullable|string',
+            'unregisteredDetails'                          => 'required_if:registrationType,Unregistered|nullable|array',
+            'unregisteredDetails.chassisNumber'            => 'nullable|string|max:100',
+            'unregisteredDetails.engineNumber'             => 'nullable|string|max:100',
+            'unregisteredDetails.importedDate'             => 'nullable|date|before_or_equal:today',
+            'unregisteredDetails.exporterName'             => 'nullable|string|max:150',
+            'unregisteredDetails.exporterContact'          => 'nullable|string|max:30',
+            'unregisteredDetails.auctionGrade'             => 'nullable|string|max:10',
+            'unregisteredDetails.registerNotification'     => 'nullable|boolean',
+            'unregisteredDetails.registerNotificationDate' => 'nullable|date',
+            'unregisteredDetails.notificationNote'         => 'nullable|string|max:1000',
+        ]);
+
+        try {
+            DB::beginTransaction();
+
+            $vehicle->update(['registration_type' => $request->registrationType]);
+
+            if ($request->registrationType === 'Registered') {
+                $vehicle->import()->delete();
+                $this->vehicleService->syncNotification($vehicle->id, null);
+                $this->vehicleService->syncRegistration($vehicle->id, $request->registeredDetails ?? []);
+            } else {
+                $vehicle->registration()->delete();
+                $this->vehicleService->syncImport($vehicle->id, $request->unregisteredDetails ?? []);
+                $this->vehicleService->syncNotification($vehicle->id, $request->unregisteredDetails ?? []);
+            }
+
+            DB::commit();
+
+            $vehicle->load(['registration', 'import', 'notification', 'images', 'dealer']);
+
+            return response()->json([
+                'message' => 'Registration type updated successfully',
+                'vehicle' => $this->transformer->transform($vehicle),
+            ]);
+
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json(['error' => 'Validation failed', 'messages' => $e->errors()], 422);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['error' => 'Failed to update registration type', 'message' => $e->getMessage()], 500);
+        }
+    }
 }
 
