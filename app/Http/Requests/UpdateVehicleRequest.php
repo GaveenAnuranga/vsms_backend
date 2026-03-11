@@ -51,7 +51,7 @@ class UpdateVehicleRequest extends FormRequest
             'unregisteredDetails'                          => 'required_if:registrationType,Unregistered|array',
             'unregisteredDetails.chassisNumber'            => 'required_if:registrationType,Unregistered|nullable|string|max:100',
             'unregisteredDetails.engineNumber'             => 'required_if:registrationType,Unregistered|nullable|string|max:100',
-            'unregisteredDetails.importedDate'             => 'required_if:registrationType,Unregistered|nullable|date|before_or_equal:today',
+            'unregisteredDetails.importedDate'             => 'nullable|date|before_or_equal:today',
             'unregisteredDetails.exporterName'             => 'required_if:registrationType,Unregistered|nullable|string|max:150',
             'unregisteredDetails.exporterContact'          => 'required_if:registrationType,Unregistered|nullable|string|max:30',
             'unregisteredDetails.registerNotification'     => 'nullable|boolean',

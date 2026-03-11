@@ -8,15 +8,15 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::table('vehicle_imports', function (Blueprint $table) {
-            $table->date('imported_date')->nullable()->after('engine_number');
-        });
+        if (!Schema::hasColumn('vehicle_imports', 'imported_date')) {
+            Schema::table('vehicle_imports', function (Blueprint $table) {
+                $table->date('imported_date')->nullable()->after('engine_number');
+            });
+        }
     }
 
     public function down(): void
     {
-        Schema::table('vehicle_imports', function (Blueprint $table) {
-            $table->dropColumn('imported_date');
-        });
+        // Column is managed by the original create migration; nothing to drop here.
     }
 };

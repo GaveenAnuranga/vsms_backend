@@ -71,6 +71,9 @@ class SaleTransformer
             $data['buyer'] = null;
         }
 
+        // seller key: reserved for seller relationship or null
+        $data['seller'] = null;
+
         return $data;
     }
 }
