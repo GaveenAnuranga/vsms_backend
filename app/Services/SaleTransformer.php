@@ -10,24 +10,25 @@ class SaleTransformer
     public function transform($sale, bool $includeBuyer = true): array
     {
         $data = [
-            'id'              => $sale->id,
-            'vehicleId'       => $sale->vehicle_id,
-            'saleDate'        => $sale->sale_date,
-            'salePrice'       => $sale->sale_price,
-            'discount'        => $sale->discount,
-            'finalAmount'     => $sale->final_amount,
-            'paymentMethodId' => $sale->payment_method_id,
-            'invoiceNumber'   => $sale->invoice_number,
-            'commission'      => $sale->commission,
-            'salespersonName' => $sale->salesperson_name,
-            'taxAmount'       => $sale->tax_amount ?? 0,
-            'branch'          => $sale->branch ?? null,
-            'documentPath'    => $sale->document_path ?? null,
-            'description'     => $sale->description ?? null,
-            'reminderDate'    => $sale->reminder_date,
-            'reminderNote'    => $sale->reminder_note ?? null,
-            'createdAt'       => $sale->created_at,
-            'updatedAt'       => $sale->updated_at,
+            'id'                 => $sale->id,
+            'vehicleId'          => $sale->vehicle_id,
+            'saleDate'           => $sale->sale_date,
+            'salePrice'          => $sale->sale_price,
+            'discount'           => $sale->discount,
+            'finalAmount'        => $sale->final_amount,
+            'paymentMethodId'    => $sale->payment_method_id,
+            'invoiceNumber'      => $sale->invoice_number,
+            'commission'         => $sale->commission,
+            'salespersonName'    => $sale->salesperson_name,
+            'taxAmount'          => $sale->tax_amount ?? 0,
+            'branch'             => $sale->branch ?? null,
+            'documentPath'       => $sale->document_path ?? null,
+            'description'        => $sale->description ?? null,
+            'paymentDescription' => $sale->payment_description ?? null,
+            'reminderDate'       => $sale->reminder_date,
+            'reminderNote'       => $sale->reminder_note ?? null,
+            'createdAt'          => $sale->created_at,
+            'updatedAt'          => $sale->updated_at,
         ];
 
         if ($sale->vehicle) {
@@ -55,7 +56,7 @@ class SaleTransformer
             ];
         }
 
-        // Always include buyer info
+        // Include buyer info if available (buyer is optional)
         if ($sale->buyer) {
             $b = $sale->buyer;
             $data['buyer'] = [
@@ -66,6 +67,8 @@ class SaleTransformer
                 'phone'    => $b->phone,
                 'email'    => $b->email,
             ];
+        } else {
+            $data['buyer'] = null;
         }
 
         return $data;

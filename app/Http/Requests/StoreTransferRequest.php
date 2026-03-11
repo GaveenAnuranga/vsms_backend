@@ -16,14 +16,10 @@ class StoreTransferRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'vehicle_id'         => 'required|exists:vehicles,id',
-            'from_dealer_id'     => 'nullable|exists:dealers,id',
-            'to_dealer_id'       => 'required|exists:dealers,id',
-            'transfer_date'      => 'required|date',
-            'transfer_price'     => 'nullable|numeric|min:0',
-            'transport_cost'     => 'nullable|numeric|min:0',
-            'status'             => 'nullable|in:pending,completed',
-            'responsible_person' => 'nullable|string|max:255',
+            'vehicle_id'     => 'required|exists:vehicles,id',
+            'to_dealer_id'   => 'required|exists:dealers,id',
+            'transfer_date'  => 'required|date',
+            'from_dealer_id' => 'nullable|exists:dealers,id',
         ];
     }
 

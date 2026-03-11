@@ -138,9 +138,8 @@ class CarPurchaseController extends Controller
         try {
             DB::beginTransaction();
 
-            $tenantId     = $this->resolveTenantId();
-            $documentPath = $this->purchaseService->handleDocumentUpload($request);
-            $response     = $this->purchaseService->storePurchase($request, $tenantId, $documentPath);
+            $tenantId = $this->resolveTenantId();
+            $response = $this->purchaseService->storePurchase($request, $tenantId, null);
 
             DB::commit();
 

@@ -63,30 +63,27 @@ class TransferController extends Controller
         try {
             DB::beginTransaction();
 
-            $transfer = Transfer::create([
-                'tenant_id' => $this->resolveTenantId(),
-                'vehicle_id' => $request->vehicle_id,
-                'from_dealer_id' => $request->from_dealer_id ?: null,
-                'to_dealer_id' => $request->to_dealer_id ?: null,
-                'transfer_date' => $request->transfer_date,
-                'transfer_price' => $request->transfer_price ?? 0,
-                'transport_cost' => $request->transport_cost ?? 0,
-                'status' => $request->status ?? 'pending',
-                'responsible_person' => $request->responsible_person ?? null,
-            ]);
+            // Auto-resolve from_dealer_id from the vehicle's current dealer
+            $vehicle = Vehicle::find($request->vehicle_id);
+            $fromDealerId = $vehicle?->dealer_id ?? null;
 
-            if ($request->status === 'completed' && $request->to_dealer_id) {
-                $vehicle = Vehicle::find($request->vehicle_id);
-                if ($vehicle) {
-                    $vehicle->update(['dealer_id' => $request->to_dealer_id]);
-                }
-            }
+            $transfer = Transfer::create([
+                'tenant_id'          => $this->resolveTenantId(),
+                'vehicle_id'         => $request->vehicle_id,
+                'from_dealer_id'     => $fromDealerId,
+                'to_dealer_id'       => $request->to_dealer_id ?: null,
+                'transfer_date'      => $request->transfer_date,
+                'transfer_price'     => 0,
+                'transport_cost'     => 0,
+                'status'             => 'pending',
+                'responsible_person' => null,
+            ]);
 
             DB::commit();
             $transfer->load(['vehicle', 'fromDealer', 'toDealer']);
 
             return response()->json([
-                'message' => 'Transfer created successfully',
+                'message'  => 'Transfer created successfully',
                 'transfer' => $this->transformer->transform($transfer),
             ], 201);
 
