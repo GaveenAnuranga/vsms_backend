@@ -11,8 +11,8 @@ return new class extends Migration
         // Make vehicles columns nullable (not required in simplified forms)
         Schema::table('vehicles', function (Blueprint $table) {
             $table->string('country_of_origin', 100)->nullable()->change();
-            $table->enum('fuel_type', ['Gasoline', 'Diesel', 'Electric', 'Hybrid', 'Plug-in Hybrid'])->nullable()->change();
-            $table->enum('transmission_type', ['Automatic', 'Manual', 'CVT', 'Semi-Automatic'])->nullable()->change();
+            $table->string('fuel_type')->nullable()->change();
+            $table->string('transmission_type')->nullable()->change();
             $table->string('color', 50)->nullable()->change();
         });
 
@@ -49,8 +49,8 @@ return new class extends Migration
 
         Schema::table('vehicles', function (Blueprint $table) {
             $table->string('color', 50)->nullable(false)->change();
-            $table->enum('transmission_type', ['Automatic', 'Manual', 'CVT', 'Semi-Automatic'])->nullable(false)->change();
-            $table->enum('fuel_type', ['Gasoline', 'Diesel', 'Electric', 'Hybrid', 'Plug-in Hybrid'])->nullable(false)->change();
+            $table->string('transmission_type')->nullable(false)->change();
+            $table->string('fuel_type')->nullable(false)->change();
             $table->string('country_of_origin', 100)->nullable(false)->change();
         });
     }
